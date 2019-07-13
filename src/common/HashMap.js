@@ -4,7 +4,11 @@ export default class HashMap {
         this._map = new Map();
         entries.forEach(e => this.set(e[0], e[1]));
     }
-    
+
+    get size() {
+        return this._map.size;
+    }
+
     get(key) {
         return this._map.get(JSON.stringify(key));
     }
@@ -21,11 +25,8 @@ export default class HashMap {
         return Array.from(this._map.keys()).map(key => JSON.parse(key));
     }
 
-    size() {
-        return this._map.size;
-    }
-
     static copy(hashMap) {
+        // TODO: find a better way to copy
         return new HashMap({entries: Array.from(hashMap._map.entries())
                 .map(entry => [JSON.parse(entry[0]), entry[1]])});
     }

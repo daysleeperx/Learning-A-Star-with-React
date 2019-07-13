@@ -3,6 +3,7 @@ import Grid from "./Grid";
 import {asciiMap} from "../common/ASCIIMap";
 import Graph from "../common/Graph";
 import HashMap from "../common/HashMap";
+import PriorityQueue from "../common/PriorityQueue";
 
 export default class Maze extends React.Component {
 
@@ -11,13 +12,9 @@ export default class Maze extends React.Component {
         this.state = {
             steps: [{
                 map: asciiMap,
-                queue: [[16, 14, 0]],
-                costSoFar: new HashMap({
-                    entries: [[{x: 16, y: 14}, 0]]
-                }),
-                cameFrom: new HashMap({
-                    entries: [[{x: 16, y: 14}, null]]
-                }),
+                queue: new PriorityQueue([[16, 14, 0]], (a, b) => a[2] < b[2]),
+                costSoFar: new HashMap({entries: [[{x: 16, y: 14}, 0]]}),
+                cameFrom: new HashMap({entries: [[{x: 16, y: 14}, null]]}),
             }],
             step: 0,
             playBack: false,
@@ -29,25 +26,15 @@ export default class Maze extends React.Component {
     }
 
     makeStep() {
-        if (this.state.steps[this.state.step].queue.length > 0) {
+        if (this.state.steps[this.state.step].queue.size() > 0) {
             const history = this.state.steps.slice(0, this.state.step + 1);
             const currentStep = history[history.length - 1];
             const grid = currentStep.map.slice().map(row => row.slice());
-            const queue = currentStep.queue.slice().map(row => row.slice());
+            const queue = PriorityQueue.copy(currentStep.queue);
             const cameFrom = HashMap.copy(currentStep.cameFrom);
             const costSoFar = HashMap.copy(currentStep.costSoFar);
 
-            let min = Number.MAX_VALUE;
-            let minIndex = -1;
-            for (let i = 0; i < queue.length; i++) {
-                if (queue[i][2] < min) {
-                    min = queue[i][2];
-                    minIndex = i;
-                }
-            }
-
-            const current = queue[minIndex];
-            queue.splice(minIndex, 1);
+            const current = queue.pop();
             grid[current[1]][current[0]] = 'v';
 
             // TODO: goal should not be hardcoded
@@ -60,7 +47,6 @@ export default class Maze extends React.Component {
                 // Maze.reconstructPath('16, 14', '13, 1', cameFrom, grid);
             }
 
-            // TODO: refactor this -> possibly separate class for location (x, y)
             this._graph.getNeighbors({x: current[0], y: current[1]}).forEach(
                 (nbr) => {
                     const newCost = costSoFar.get({x: current[0], y: current[1]}) + 1;
@@ -154,9 +140,7 @@ export default class Maze extends React.Component {
         return (
             <div className="game">
                 <div className="game-board">
-                    <Grid
-                        map={current.map}
-                    />
+                    <Grid map={current.map}/>
 
                     <div className={"btn-group-lg mt-4 text-center"}>
                         <button className={"btn btn-outline-primary"} onClick={() => this.handleBack()}>
@@ -175,7 +159,7 @@ export default class Maze extends React.Component {
                 <div className="game-info">
                     <p>Queue: {current.queue.length}</p>
                     <p>Step: {this.state.step}</p>
-                    <p>Visited: {current.cameFrom.size()}</p>
+                    <p>Visited: {current.cameFrom.size}</p>
                 </div>
             </div>
         );
