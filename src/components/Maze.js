@@ -19,6 +19,7 @@ export default class Maze extends React.Component {
             step: 0,
             playBack: false,
         };
+        this._goal = [13, 1];
     }
 
     componentDidMount() {
@@ -33,22 +34,12 @@ export default class Maze extends React.Component {
             const queue = PriorityQueue.copy(currentStep.queue);
             const cameFrom = HashMap.copy(currentStep.cameFrom);
             const costSoFar = HashMap.copy(currentStep.costSoFar);
-
             const current = queue.pop();
+
             grid[current[1]][current[0]] = 'v';
+            this.validatePath(current);
 
-            // TODO: goal should not be hardcoded
-
-            if (current[1] === 1 && current[0] === 13) {
-                this.setState({
-                    playBack: false,
-                });
-                clearInterval(this._interval);
-                // Maze.reconstructPath('16, 14', '13, 1', cameFrom, grid);
-            }
-
-            this._graph.getNeighbors({x: current[0], y: current[1]}).forEach(
-                (nbr) => {
+            this._graph.getNeighbors({x: current[0], y: current[1]}).forEach((nbr) => {
                     const newCost = costSoFar.get({x: current[0], y: current[1]}) + 1;
                     if (!costSoFar.hasKey(nbr) || newCost < costSoFar.get(nbr)) {
                         costSoFar.set(nbr, newCost);
@@ -58,17 +49,27 @@ export default class Maze extends React.Component {
                     }
                 }
             );
-
-            this.setState({
-                steps: history.concat([{
-                    map: grid,
-                    cameFrom: cameFrom,
-                    queue: queue,
-                    costSoFar: costSoFar,
-                }]),
-                step: history.length,
-            });
+            this.updateHistory(history, {map: grid, cameFrom: cameFrom, queue: queue, costSoFar: costSoFar});
         }
+    }
+
+    updateHistory(history, step) {
+        this.setState({
+            steps: history.concat([step]),
+            step: history.length,
+        });
+    }
+
+    validatePath(current) {
+        if (this.isGoal(current)) {
+            this.setState({playBack: false});
+            clearInterval(this._interval);
+            // Maze.reconstructPath('16, 14', '13, 1', cameFrom, grid);
+        }
+    }
+
+    isGoal(current) {
+        return current[1] === this._goal[1] && current[0] === this._goal[0];
     }
 
     static reconstructPath(start, goal, cameFrom, grid) {
@@ -157,7 +158,7 @@ export default class Maze extends React.Component {
                     </div>
                 </div>
                 <div className="game-info">
-                    <p>Queue: {current.queue.length}</p>
+                    <p>Queue: {current.queue.size()}</p>
                     <p>Step: {this.state.step}</p>
                     <p>Visited: {current.cameFrom.size}</p>
                 </div>
