@@ -32,7 +32,6 @@ const Maze = () => {
             const costSoFar = HashMap.copy(currentStep.costSoFar);
             const current = _.omit(queue.pop(), 'f');
 
-
             grid[current.y][current.x] = 'v';
             if (isGoal(current)) {
                 setPlayBack(false);
@@ -55,8 +54,7 @@ const Maze = () => {
                 queue: queue,
                 costSoFar: costSoFar
             }]));
-            let number = history.length;
-            setStep(number);
+            setStep(history.length);
         }
     };
 
