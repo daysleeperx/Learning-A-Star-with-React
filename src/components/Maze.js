@@ -31,8 +31,9 @@ const Maze = () => {
             const cameFrom = HashMap.copy(currentStep.cameFrom);
             const costSoFar = HashMap.copy(currentStep.costSoFar);
             const current = _.omit(queue.pop(), 'f');
+            const {x, y} = current;
 
-            grid[current.y][current.x] = 'v';
+            grid[y][x] = 'v';
             if (isGoal(current)) {
                 setPlayBack(false);
                 reconstructPath(cameFrom, grid);
@@ -60,16 +61,18 @@ const Maze = () => {
 
     const isGoal = ({x, y}) => y === _graph.goal.y && x === _graph.goal.x;
 
+    const isStart = ({x, y}) => y === _graph.start.y && x === _graph.start.x;
+
     const reconstructPath = (cameFrom, map) => {
         let current = _graph.goal;
 
-        while (JSON.stringify(current) !== JSON.stringify(_graph.start)) {
-            map[current.y][current.x] = 'p';
+        while (!isStart(current)) {
+            const {x, y} = current;
+            map[y][x] = 'p';
             if (cameFrom.hasKey(current)) {
                 current = cameFrom.get(current);
             }
         }
-        map[current.y][current.x] = 'p';
     };
 
     const handleForward = () => {

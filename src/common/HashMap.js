@@ -4,6 +4,10 @@ class HashMap {
         entries.forEach(e => this.set(e[0], e[1]));
     }
 
+    get map() {
+        return this._map;
+    }
+
     get size() {
         return this._map.size;
     }
@@ -24,10 +28,10 @@ class HashMap {
         return Array.from(this._map.keys()).map(key => JSON.parse(key));
     }
 
-    static copy(hashMap) {
+    static copy({map}) {
         // TODO: find a better way to copy
         return new HashMap({
-            entries: Array.from(hashMap._map.entries())
+            entries: Array.from(map.entries())
                 .map(entry => [JSON.parse(entry[0]), entry[1]])
         });
     }

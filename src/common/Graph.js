@@ -35,7 +35,7 @@ class Graph {
 
     addNeighbors(node) {
         const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-        dirs.forEach(dir => this.addNeighbor(node, {x: node['x'] + dir[1], y: node['y'] + dir[0]}));
+        dirs.forEach(dir => this.addNeighbor(node, {x: node.x + dir[1], y: node.y + dir[0]}));
     }
 
     getNeighbors(node) {

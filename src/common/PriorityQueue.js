@@ -10,16 +10,8 @@ class PriorityQueue {
         return this._heap;
     }
 
-    set heap(value) {
-        this._heap = value;
-    }
-
     get comparator() {
         return this._comparator;
-    }
-
-    set comparator(value) {
-        this._comparator = value;
     }
 
     _parent = (i) => ((i + 1) >>> 1) - 1;
@@ -82,8 +74,8 @@ class PriorityQueue {
         }
     }
 
-    static copy(queue) {
-        return new PriorityQueue(queue.heap, queue.comparator);
+    static copy({heap, comparator}) {
+        return new PriorityQueue(heap, comparator);
     }
 }
 
