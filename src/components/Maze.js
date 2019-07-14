@@ -60,9 +60,7 @@ const Maze = () => {
         }
     };
 
-    const isGoal = ({x, y}) => {
-        return y === _graph.goal.y && x === _graph.goal.x;
-    };
+    const isGoal = ({x, y}) => y === _graph.goal.y && x === _graph.goal.x;
 
     const reconstructPath = (cameFrom, map) => {
         let current = _graph.goal;
