@@ -1,9 +1,7 @@
 import React from "react";
 
-export default class Square extends React.Component {
-
-    static getSquareClass(value) {
-
+const Square = ({value}) => {
+    const getSquareClass = (value) => {
         switch (value) {
             case '*':
                 return 'lava';
@@ -17,13 +15,13 @@ export default class Square extends React.Component {
             default:
                 return 'square';
         }
-    }
+    };
 
-    render() {
-        return (
-            <button className={Square.getSquareClass(this.props.value)}>
+    return (
+        <button className={getSquareClass(value)}>
 
-            </button>
-        );
-    }
-}
+        </button>
+    );
+};
+
+export { Square };

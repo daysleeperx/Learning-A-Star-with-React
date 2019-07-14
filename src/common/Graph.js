@@ -1,9 +1,26 @@
-import HashMap from "./HashMap";
+import { HashMap } from "./HashMap";
 
-export default class Graph {
-
+class Graph {
     constructor() {
         this._neighbors = new HashMap({});
+        this._start = {};
+        this._goal = {};
+    }
+
+    get start() {
+        return this._start;
+    }
+
+    set start(value) {
+        this._start = value;
+    }
+
+    get goal() {
+        return this._goal;
+    }
+
+    set goal(value) {
+        this._goal = value;
     }
 
     addNode(node) {
@@ -43,6 +60,12 @@ export default class Graph {
                 if (grid[row][col] !== '*') {
                     graph.addNode({x: col, y: row});
                 }
+                if (grid[row][col] === 's') {
+                    graph.start = {x: col, y: row};
+                }
+                if (grid[row][col] === 'D') {
+                    graph.goal = {x: col, y: row};
+                }
             }
         }
 
@@ -51,3 +74,5 @@ export default class Graph {
         return graph;
     }
 }
+
+export { Graph };

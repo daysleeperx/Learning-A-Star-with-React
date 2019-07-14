@@ -1,168 +1,131 @@
-import React from "react";
-import Grid from "./Grid";
-import {asciiMap} from "../common/ASCIIMap";
-import Graph from "../common/Graph";
-import HashMap from "../common/HashMap";
-import PriorityQueue from "../common/PriorityQueue";
+import React, { useState } from "react";
+import { Grid } from "./Grid";
+import { asciiMap } from "../common/ASCIIMap";
+import { Graph } from "../common/Graph";
+import { HashMap } from "../common/HashMap";
+import { PriorityQueue } from "../common/PriorityQueue";
+import useInterval from 'use-interval'
+import { heuristic } from "../common/Util";
+import * as _ from "lodash";
 
-export default class Maze extends React.Component {
+const Maze = () => {
+    const [steps, setSteps] = useState([{
+        map: asciiMap,
+        queue: new PriorityQueue([{x: 16, y: 14, f: 0}], (a, b) => a.f < b.f),
+        costSoFar: new HashMap({entries: [[{x: 16, y: 14}, 0]]}),
+        cameFrom: new HashMap({entries: [[{x: 16, y: 14}, null]]})
+    }]);
+    const [step, setStep] = useState(0);
+    const [playBack, setPlayBack] = useState(false);
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            steps: [{
-                map: asciiMap,
-                queue: new PriorityQueue([[16, 14, 0]], (a, b) => a[2] < b[2]),
-                costSoFar: new HashMap({entries: [[{x: 16, y: 14}, 0]]}),
-                cameFrom: new HashMap({entries: [[{x: 16, y: 14}, null]]}),
-            }],
-            step: 0,
-            playBack: false,
-        };
-        this._goal = [13, 1];
-    }
+    const _graph = Graph.gridToGraph(steps[0].map);
 
-    componentDidMount() {
-        this._graph = Graph.gridToGraph(this.state.steps[0].map)
-    }
+    useInterval(() => makeStep(), playBack ? 10 : null);
 
-    makeStep() {
-        if (this.state.steps[this.state.step].queue.size() > 0) {
-            const history = this.state.steps.slice(0, this.state.step + 1);
+    const makeStep = () => {
+        if (!steps[step].queue.isEmpty()) {
+            const history = steps.slice(0, step + 1);
             const currentStep = history[history.length - 1];
             const grid = currentStep.map.slice().map(row => row.slice());
             const queue = PriorityQueue.copy(currentStep.queue);
             const cameFrom = HashMap.copy(currentStep.cameFrom);
             const costSoFar = HashMap.copy(currentStep.costSoFar);
-            const current = queue.pop();
+            const current = _.omit(queue.pop(), 'f');
 
-            grid[current[1]][current[0]] = 'v';
-            this.validatePath(current);
 
-            this._graph.getNeighbors({x: current[0], y: current[1]}).forEach((nbr) => {
-                    const newCost = costSoFar.get({x: current[0], y: current[1]}) + 1;
+            grid[current.y][current.x] = 'v';
+            if (isGoal(current)) {
+                setPlayBack(false);
+                reconstructPath(cameFrom, grid);
+            }
+
+            _graph.getNeighbors(current).forEach((nbr) => {
+                    const newCost = costSoFar.get(current) + 1;
                     if (!costSoFar.hasKey(nbr) || newCost < costSoFar.get(nbr)) {
                         costSoFar.set(nbr, newCost);
-                        const priority = newCost + Maze.heuristic([13, 1], [nbr['x'], nbr['y']]);
-                        queue.push([nbr['x'], nbr['y'], priority]);
-                        cameFrom.set(nbr, current.slice(0, 2));
+                        const priority = newCost + heuristic(_graph.goal, current);
+                        queue.push({...nbr, f: priority});
+                        cameFrom.set(nbr, current);
                     }
                 }
             );
-            this.updateHistory(history, {map: grid, cameFrom: cameFrom, queue: queue, costSoFar: costSoFar});
+            setSteps(history.concat([{
+                map: grid,
+                cameFrom: cameFrom,
+                queue: queue,
+                costSoFar: costSoFar
+            }]));
+            let number = history.length;
+            setStep(number);
         }
-    }
+    };
 
-    updateHistory(history, step) {
-        this.setState({
-            steps: history.concat([step]),
-            step: history.length,
-        });
-    }
+    const isGoal = ({x, y}) => {
+        return y === _graph.goal.y && x === _graph.goal.x;
+    };
 
-    validatePath(current) {
-        if (this.isGoal(current)) {
-            this.setState({playBack: false});
-            clearInterval(this._interval);
-            // Maze.reconstructPath('16, 14', '13, 1', cameFrom, grid);
-        }
-    }
+    const reconstructPath = (cameFrom, map) => {
+        let current = _graph.goal;
 
-    isGoal(current) {
-        return current[1] === this._goal[1] && current[0] === this._goal[0];
-    }
-
-    static reconstructPath(start, goal, cameFrom, grid) {
-        let current = goal;
-
-        while (current !== start) {
-            grid[Number(current.split(', ')[1])][Number(current.split(', ')[0])] = 'p';
-            if (!!cameFrom.get(current)) {
+        while (JSON.stringify(current) !== JSON.stringify(_graph.start)) {
+            map[current.y][current.x] = 'p';
+            if (cameFrom.hasKey(current)) {
                 current = cameFrom.get(current);
             }
         }
-        grid[Number(current.split(', ')[1])][Number(current.split(', ')[0])] = 'p';
-    }
+        map[current.y][current.x] = 'p';
+    };
 
-    static heuristic(goal, nbr) {
-        // Manhattan distance on a square grid
-        return Math.abs(goal[0] - nbr[0]) + Math.abs(goal[1] - nbr[1]);
-    }
+    const handleForward = () => {
+        togglePause();
+        makeStep();
+    };
 
-    handlePlay() {
-        this.togglePlay();
-        this.state.playBack ? clearInterval(this._interval) : this.doPlay();
-    }
+    const handleBack = () => {
+        togglePause();
 
-    handleForward() {
-        this.togglePause();
-        clearInterval(this._interval);
-        this.makeStep();
-    }
-
-    handleBack() {
-        this.togglePause();
-        clearInterval(this._interval);
-
-        let currentStep = this.state.step - 1;
+        let currentStep = step - 1;
         if (currentStep >= 0) {
-            this.jumpTo(currentStep);
+            jumpTo(currentStep);
         }
-    }
+    };
 
-    togglePlay() {
-        this.setState(prevState => ({
-            playBack: !prevState.playBack,
-        }));
-    }
+    const handlePlay = () => setPlayBack(!playBack);
 
-    togglePause() {
-        if (this.state.playBack) {
-            this.setState({
-                playBack: false,
-            });
-        }
-    }
+    const togglePause = () => {
+        if (playBack) setPlayBack(false);
+    };
 
-    doPlay() {
-        this._interval = setInterval(() => this.makeStep(), 100);
-    }
+    const jumpTo = (step) => setStep(step);
 
-    jumpTo(step) {
-        this.setState({
-            step: step
-        });
-    }
+    const current = steps[step];
 
-    render() {
-        const steps = this.state.steps;
-        const current = steps[this.state.step];
+    return (
+        <div className="game">
+            <div className="game-board">
+                <Grid map={current.map}/>
 
-        return (
-            <div className="game">
-                <div className="game-board">
-                    <Grid map={current.map}/>
+                <div className={"btn-group-lg mt-4 text-center"}>
+                    <button className={"btn btn-outline-primary"} onClick={() => handleBack()}>
+                        Back
+                    </button>
 
-                    <div className={"btn-group-lg mt-4 text-center"}>
-                        <button className={"btn btn-outline-primary"} onClick={() => this.handleBack()}>
-                            Back
-                        </button>
+                    <button className={"btn btn-outline-primary"} onClick={() => handlePlay()}>
+                        {playBack ? 'Pause' : 'Play'}
+                    </button>
 
-                        <button className={"btn btn-outline-primary"} onClick={() => this.handlePlay()}>
-                            {this.state.playBack ? 'Pause' : 'Play'}
-                        </button>
-
-                        <button className={"btn btn-outline-primary"} onClick={() => this.handleForward()}>
-                            Forward
-                        </button>
-                    </div>
-                </div>
-                <div className="game-info">
-                    <p>Queue: {current.queue.size()}</p>
-                    <p>Step: {this.state.step}</p>
-                    <p>Visited: {current.cameFrom.size}</p>
+                    <button className={"btn btn-outline-primary"} onClick={() => handleForward()}>
+                        Forward
+                    </button>
                 </div>
             </div>
-        );
-    }
-}
+            <div className="game-info">
+                <p>Queue: {current.queue.size()}</p>
+                <p>Step: {step}</p>
+                <p>Visited: {current.cameFrom.size}</p>
+            </div>
+        </div>
+    );
+};
+
+export { Maze };

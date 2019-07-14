@@ -1,33 +1,29 @@
 import React from "react";
-import Square from "./Square";
+import { Square } from "./Square";
 
-export default class Grid extends React.Component {
+const Grid = ({map}) => {
+    const renderSquare = (i) => <Square value={i}/>;
 
-    renderSquare(i) {
-        return <Square value={i}/>;
-    }
-
-    createMaze = () => {
+    const createMaze = () => {
         let rows = [];
 
-        for (let i = 0; i < this.props.map.length; i++) {
+        for (let i = 0; i < map.length; i++) {
             let columns = [];
 
-            for (let j = 0; j < this.props.map[0].length; j++) {
-                columns.push(this.renderSquare(this.props.map[i][j]))
+            for (let j = 0; j < map[0].length; j++) {
+                columns.push(renderSquare(map[i][j]))
             }
             rows.push(<div className="board-row">{columns}</div>)
         }
         return rows;
     };
 
-    render() {
 
-        return (
-            <div>
-                {this.createMaze()}
-            </div>
+    return (
+        <div>
+            {createMaze()}
+        </div>
+    );
+};
 
-        );
-    }
-}
+export { Grid };

@@ -1,5 +1,4 @@
-export default class PriorityQueue {
-
+class PriorityQueue {
     constructor(values, comparator = (a, b) => a < b) {
         this._top = 0;
         this._heap = [];
@@ -44,7 +43,6 @@ export default class PriorityQueue {
             this._heap.push(value);
             this._siftUp();
         });
-        return this.size();
     }
 
     pop() {
@@ -88,3 +86,5 @@ export default class PriorityQueue {
         return new PriorityQueue(queue.heap, queue.comparator);
     }
 }
+
+export { PriorityQueue };

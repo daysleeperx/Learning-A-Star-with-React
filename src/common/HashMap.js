@@ -1,5 +1,4 @@
-export default class HashMap {
-
+class HashMap {
     constructor({entries = []}) {
         this._map = new Map();
         entries.forEach(e => this.set(e[0], e[1]));
@@ -27,7 +26,11 @@ export default class HashMap {
 
     static copy(hashMap) {
         // TODO: find a better way to copy
-        return new HashMap({entries: Array.from(hashMap._map.entries())
-                .map(entry => [JSON.parse(entry[0]), entry[1]])});
+        return new HashMap({
+            entries: Array.from(hashMap._map.entries())
+                .map(entry => [JSON.parse(entry[0]), entry[1]])
+        });
     }
 }
+
+export { HashMap };
