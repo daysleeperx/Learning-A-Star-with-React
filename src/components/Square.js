@@ -3,15 +3,14 @@ import React from "react";
 const Square = ({value}) => {
     const getSquareClass = (value) => {
         switch (value) {
-            case '*':
-                return 'lava';
-
-            case 'v':
-                return 'visited';
-
+            case 's':
+            case 'D':
             case 'p':
                 return 'path';
-
+            case '*':
+                return 'lava';
+            case 'v':
+                return 'visited';
             default:
                 return 'square';
         }
