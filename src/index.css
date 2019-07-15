@@ -4,86 +4,35 @@ body {
     background: black;
 }
 
-ol, ul {
-    padding-left: 30px;
+h1 {
+    color: #FE00FE;
 }
 
-.board-row:after {
-    clear: both;
-    content: "";
-    display: table;
+.board-row {
+    display: flex;
+}
+
+.square {
+    background: #010001;
+    border: 1px solid #5CCBEA;
+    margin-right: -1px;
+    margin-top: -1px;
 }
 
 .status {
     margin-bottom: 10px;
 }
 
-.square {
-    background: #010001;
-    border: 1px solid #5CCBEA;
-    float: left;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 34px;
-    height: 34px;
-    margin-right: -1px;
-    margin-top: -1px;
-    padding: 0;
-    text-align: center;
-    width: 34px;
-}
-
 .visited {
     background: #FE00FE;
-    border: 1px solid #5CCBEA;
-    float: left;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 34px;
-    height: 34px;
-    margin-right: -1px;
-    margin-top: -1px;
-    padding: 0;
-    text-align: center;
-    width: 34px;
 }
 
 .lava {
     background: #3314ff;
-    border: 1px solid #5CCBEA;
-    float: left;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 34px;
-    height: 34px;
-    margin-right: -1px;
-    margin-top: -1px;
-    padding: 0;
-    text-align: center;
-    width: 34px;
 }
 
 .path {
     background: #59ff00;
-    border: 1px solid #5CCBEA;
-    float: left;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 34px;
-    height: 34px;
-    margin-right: -1px;
-    margin-top: -1px;
-    padding: 0;
-    text-align: center;
-    width: 34px;
-}
-
-.square:focus {
-    outline: none;
-}
-
-.kbd-navigation .square:focus {
-    background: #ddd;
 }
 
 .game {
@@ -96,6 +45,10 @@ ol, ul {
     color: white;
 }
 
-h1 {
-    color: #FE00FE;
+.error {
+    color: red;
+    font-size: large;
+    background: black;
+    border-color: red;
 }
+

@@ -1,25 +1,24 @@
 import React from "react";
 
-const Square = ({value}) => {
+const Square = ({value, style}) => {
     const getSquareClass = (value) => {
         switch (value) {
             case 's':
-            case 'D':
             case 'p':
+            case 'D':
                 return 'path';
             case '*':
                 return 'lava';
             case 'v':
                 return 'visited';
             default:
-                return 'square';
+                return '';
         }
     };
 
     return (
-        <button className={getSquareClass(value)}>
-
-        </button>
+        <div className={'square ' + getSquareClass(value)} style={style}>
+        </div>
     );
 };
 

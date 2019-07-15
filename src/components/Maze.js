@@ -13,8 +13,9 @@ const Maze = () => {
     const [playBack, setPlayBack] = useState(false);
     const [fileUploaded, setFileUploaded] = useState(false);
     const [graph, setGraph] = useState(new Graph());
+    const [errorMessage, setErrorMessage] = useState('');
 
-    useInterval(() => makeStep(), playBack ? 100 : null);
+    useInterval(() => makeStep(), playBack ? 10: null);
 
     const makeStep = () => {
         if (!steps[step].queue.isEmpty()) {
@@ -102,8 +103,28 @@ const Maze = () => {
 
     const jumpTo = (step) => setStep(step);
 
+    const validateFile = (file) => {
+        const maxFileSize = 2500;
+        const fileType = 'text/plain';
+        console.log(file);
+
+        setErrorMessage('');
+
+        if (file.size > maxFileSize) {
+            setErrorMessage("File size is too big!");
+            return false;
+        }
+        if (file.type !== fileType) {
+            setErrorMessage("File is not plain text!");
+            return false;
+        }
+        return true;
+    };
+
     const handleFileChosen = (file) => {
-        // TODO: validate file
+        if (!validateFile(file)) {
+            return;
+        }
         const fileReader = new FileReader();
         fileReader.onload = () => {
             const text = fileReader.result;
@@ -165,6 +186,9 @@ const Maze = () => {
     }
     return (
         <div className={"btn-group-lg mt-4 text-center"}>
+            <div className="alert alert-danger error" role="alert" style={{visibility: !!errorMessage ? 'visible' : 'hidden'}}>
+                {errorMessage.toUpperCase()}
+            </div>
             <h1>A * Animation</h1>
             <label className={"btn btn-outline-primary"}>
                 Upload File

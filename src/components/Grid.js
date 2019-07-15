@@ -2,7 +2,10 @@ import React from "react";
 import { Square } from "./Square";
 
 const Grid = ({map}) => {
-    const renderSquare = (i) => <Square value={i}/>;
+    const renderSquare = (i) => {
+        const size = `calc(90vw / ${map[0].length})`;
+        return <Square value={i} style={{width: size, height: size}}/>;
+    };
 
     const createMaze = () => {
         let rows = [];
@@ -18,9 +21,8 @@ const Grid = ({map}) => {
         return rows;
     };
 
-
     return (
-        <div>
+        <div className={'board'}>
             {createMaze()}
         </div>
     );
