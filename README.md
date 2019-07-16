@@ -1,8 +1,8 @@
 # Learning [A Star](https://www.redblobgames.com/pathfinding/a-star/introduction.html) Algorithm with React
 
-App made for fun in order to learn A*, [**React Hooks**](https://reactjs.org/docs/hooks-intro.html) and different ES6 concepts.
+*App made for fun in order to learn A*, [**React Hooks**](https://reactjs.org/docs/hooks-intro.html) *and different ES6 concepts.
 
-*Running the app:*
+## Running the app
 ```
 docker run -p 3000:3000 daysleeperx/labyrinth:SNAPSHOT-1.0.0
 ```
