@@ -5,22 +5,24 @@ import { HashMap } from "../common/HashMap";
 import { PriorityQueue } from "../common/PriorityQueue";
 import useInterval from 'use-interval'
 import { heuristic } from "../common/Util";
+import { Intro } from "./Intro";
 import * as _ from "lodash";
+import { GameInfo } from "./GameInfo";
 
 const Maze = () => {
-    const [steps, setSteps] = useState([]);
+    const [history, setHistory] = useState([]);
     const [step, setStep] = useState(0);
     const [playBack, setPlayBack] = useState(false);
     const [fileUploaded, setFileUploaded] = useState(false);
     const [graph, setGraph] = useState(new Graph());
     const [errorMessage, setErrorMessage] = useState('');
 
-    useInterval(() => makeStep(), playBack ? 10: null);
+    useInterval(() => makeStep(), playBack ? 10 : null);
 
     const makeStep = () => {
-        if (!steps[step].queue.isEmpty()) {
-            const history = steps.slice(0, step + 1);
-            const currentStep = history[history.length - 1];
+        if (!history[step].queue.isEmpty()) {
+            const prevHistory = history.slice(0, step + 1);
+            const currentStep = prevHistory[prevHistory.length - 1];
             const grid = currentStep.map.slice().map(row => row.slice());
             const queue = PriorityQueue.copy(currentStep.queue);
             const cameFrom = HashMap.copy(currentStep.cameFrom);
@@ -45,13 +47,13 @@ const Maze = () => {
                     }
                 }
             );
-            setSteps(history.concat([{
+            setHistory(prevHistory.concat([{
                 map: grid,
                 cameFrom: cameFrom,
                 queue: queue,
                 costSoFar: costSoFar
             }]));
-            setStep(history.length);
+            setStep(prevHistory.length);
         }
     };
 
@@ -122,7 +124,7 @@ const Maze = () => {
     };
 
     const handleFileChosen = (file) => {
-        if (!validateFile(file)) {
+        if (!file || !validateFile(file)) {
             return;
         }
         const fileReader = new FileReader();
@@ -131,7 +133,7 @@ const Maze = () => {
             const asciiMap = text.split('\n').map(row => row.split(''));
             const graph = Graph.gridToGraph(asciiMap);
             setGraph(graph);
-            setSteps([{
+            setHistory([{
                 map: asciiMap,
                 queue: new PriorityQueue([{
                     ...graph.start, f: 0
@@ -145,7 +147,7 @@ const Maze = () => {
         fileReader.readAsText(file);
     };
 
-    const current = fileUploaded ? steps[step] : null;
+    const current = fileUploaded ? history[step] : null;
 
     if (fileUploaded) {
         return (
@@ -176,23 +178,20 @@ const Maze = () => {
                         </button>
                     </div>
                 </div>
-                <div className="game-info">
-                    <p>Queue: {current.queue.size()}</p>
-                    <p>Step: {step}</p>
-                    <p>Visited: {current.cameFrom.size}</p>
-                </div>
+                <GameInfo queueSize={current.queue.size()} step={step} cameFromSize={current.cameFrom.size}/>
             </div>
         );
     }
     return (
-        <div className={"btn-group-lg mt-4 text-center"}>
+        <div className={"btn-group-lg-vertical mt-4 text-center"}>
             <div className="alert alert-danger error" role="alert" style={{visibility: !!errorMessage ? 'visible' : 'hidden'}}>
                 {errorMessage.toUpperCase()}
             </div>
             <h1>A * Animation</h1>
-            <label className={"btn btn-outline-primary"}>
+            <Intro/>
+            <label className={"btn btn-lg btn-outline-primary mt-4"}>
                 Upload File
-                <input type={"file"} accept={".txt"} onChange={e => handleFileChosen(e.target.files[0])} hidden/>
+                <input type={"file"} accept={".txt"} onChange={event => handleFileChosen(event.target.files[0])} hidden/>
             </label>
         </div>
     );

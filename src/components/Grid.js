@@ -22,7 +22,7 @@ const Grid = ({map}) => {
     };
 
     return (
-        <div className={'board'}>
+        <div>
             {createMaze()}
         </div>
     );
