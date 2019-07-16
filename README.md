@@ -1,6 +1,6 @@
 # Learning A Star Algorithm with React
 
-App made for fun in order to learn A*, React Hooks, different ES6 concepts.
+App made for fun in order to learn A*, React Hooks and different ES6 concepts.
 
 *Running the app:*
 ```
