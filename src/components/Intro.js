@@ -18,7 +18,7 @@ const Intro = () => {
                 <p className="card-text">{text}</p>
                 <a href={examples} className="card-link link">Examples</a>
                 <a href={gitHubLink} className="card-link link">
-                    <img className={'logo'} src={logo} style={{width: '1.5em'}}/>
+                    <img alt={'github'} className={'logo'} src={logo} style={{width: '1.5em'}}/>
                 </a>
             </div>
         </div>
