@@ -1,4 +1,5 @@
 import React from "react";
+import logo from '../resources/github-character.svg';
 
 const Intro = () => {
     const text =
@@ -16,7 +17,9 @@ const Intro = () => {
                 <h6 className="card-subtitle mb-2 text-muted">Format:</h6>
                 <p className="card-text">{text}</p>
                 <a href={examples} className="card-link link">Examples</a>
-                <a href={gitHubLink} className="card-link link">Github</a>
+                <a href={gitHubLink} className="card-link link">
+                    <img className={'logo'} src={logo} style={{width: '1.5em'}}/>
+                </a>
             </div>
         </div>
     );
