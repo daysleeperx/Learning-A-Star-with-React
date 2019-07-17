@@ -4,7 +4,7 @@
 
 ## Running the app
 ```
-docker run -p 3000:3000 daysleeperx/labyrinth:SNAPSHOT-1.0.0
+docker run -p 3000:3000 daysleeperx/labyrinth:1.0.0-SNAPSHOT
 ```
 ![screencapture-localhost-3000-2019-07-16-15_49_24](https://user-images.githubusercontent.com/25648700/61295744-6d047680-a7e1-11e9-9e95-5c2496ae1193.png)
 
